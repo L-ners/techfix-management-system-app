@@ -1,7 +1,12 @@
+"use client";
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from "react-router-dom";
-import RegisterAppointment from "./components/RegisterAppointment";
-import AppointmentList from "./components/AppointmentList";
+import RegisterAppointment from "@/components/RegisterAppointment";
+import AppointmentList from "@/components/AppointmentList";
+
+
+
 
 function WelcomePage() {
   const navigate = useNavigate(); // Use navigate for programmatic navigation
@@ -44,10 +49,5 @@ function App() {
   );
 }
 
+
 export default App;
-
-
-
-
-
-
