@@ -1,30 +1,37 @@
+## TechFix Management System
+
+A cloud-based appointment management system built on AWS with a React frontend, a serverless backend using AWS Lambda, and an RDS PostgreSQL database.
+
+### Project Structure
+
+```
 techfix-management-system/
 ├── frontend/                # React frontend hosted on Amazon S3
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── index.js
-│   ├── public/
-│   ├── package.json
-│   ├── README.md
-│   └── build/ (Generated after running npm build)
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/           # Application pages
+│   │   └── index.js         # Main entry point
+│   ├── public/              # Static assets
+│   ├── package.json         # Dependencies and scripts
+│   ├── README.md            # Frontend documentation
+│   └── build/               # Production-ready frontend
 ├── backend/                 # Serverless backend using AWS Lambda
 │   ├── lambda/
-│   │   ├── registerAppointment.py
-│   │   ├── appointmentList.py
-│   │   └── config.json
-│   ├── requirements.txt
-│   ├── API-GatewayConfig.json
-│   ├── RDS-Schema.sql
-│   ├── IAM-Policies.json
-│   └── README.md
+│   │   ├── registerAppointment.py  # Handles appointment creation
+│   │   ├── appointmentList.py      # Retrieves scheduled appointments
+│   │   └── config.json             # Configuration file
+│   ├── requirements.txt      # Python dependencies
+│   ├── API-GatewayConfig.json # API Gateway setup
+│   ├── RDS-Schema.sql        # Database schema definition
+│   ├── IAM-Policies.json     # IAM roles and policies
+│   └── README.md             # Backend documentation
 ├── infrastructure/           # AWS Infrastructure Configuration
-│   ├── S3Config.json
-│   ├── API-GatewayConfig.json
-│   ├── Lambda-Roles.json
-│   ├── CloudFormation.yaml
-│   ├── EnvironmentVariables.txt
-│   └── README.md
+│   ├── S3Config.json         # S3 setup for frontend hosting
+│   ├── API-GatewayConfig.json # API Gateway routes and policies
+│   ├── Lambda-Roles.json     # IAM roles for Lambda execution
+│   ├── CloudFormation.yaml   # Infrastructure as code setup
+│   ├── EnvironmentVariables.txt # Environment-specific configurations
+│   └── README.md             # Infrastructure documentation
 └── README.md                 # Project Documentation
 
 # Frontend – Hosted on Amazon S3
