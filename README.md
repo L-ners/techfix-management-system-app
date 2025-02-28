@@ -27,26 +27,21 @@ techfix-management-system/
 │   └── README.md
 └── README.md                 # Project Documentation
 
+# Frontend – Hosted on Amazon S3
+- Built using React.js and hosted on Amazon S3 as a static website.
+- Amazon CloudFront is used for global content delivery.
+- CORS policies allow frontend to communicate with API Gateway.
 
-Frontend – Hosted on Amazon S3
-
-I built the frontend using React.js and hosted it on Amazon S3 as a static website.
-
-Amazon CloudFront is used for global content delivery.
-
-CORS policies allow the frontend to communicate with API Gateway.
-
-Frontend Deployment Steps
-
+# Frontend Deployment Steps
+```sh
 cd frontend
 npm install
 npm run build
 aws s3 sync build/ s3://tms-frontend-bucket --acl public-read
+```
 
-
-S3 Bucket Policy (for public access)
-
-json
+# S3 Bucket Policy (for public access)
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -59,11 +54,10 @@ json
         }
     ]
 }
+```
 
-
-CORS Configuration
-
-json
+# CORS Configuration
+```json
 [
     {
         "AllowedHeaders": ["*"],
@@ -73,61 +67,46 @@ json
         "MaxAgeSeconds": 3000
     }
 ]
+```
 
+# API Gateway – Routing Requests
+- Configured Amazon API Gateway to manage HTTP requests and route them to Lambda functions.
 
- 
- API Gateway – Routing Requests
+## Configured Endpoints
+- `POST /registerAppointment` : Saves a new appointment to RDS.
+- `GET /appointments` : Retrieves all scheduled appointments.
 
-I configured Amazon API Gateway to manage HTTP requests and route them to the appropriate Lambda functions.
-
-Configured Endpoints
-
-POST /registerAppointment , Saves a new appointment to RDS
-
-GET /appointments, Retrieves all scheduled appointments
-
-
-Enable CORS in API Gateway
-
+## Enable CORS in API Gateway
+```json
 {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers": "*"
 }
+```
 
+# Backend – AWS Lambda (Python)
+- Serverless backend running on AWS Lambda with Python.
 
-Backend – AWS Lambda (Python)
+## Lambda Functions
+- `registerAppointment.py` – Inserts appointment data into RDS.
+- `appointmentList.py` – Retrieves appointment data from RDS.
+- `lambda_function.py` – Main Lambda function handler.
 
-The backend is completely serverless, running on AWS Lambda with Python.
+# Database – Amazon RDS (PostgreSQL)
+- Hosted on Amazon RDS (PostgreSQL), securely stores all appointments.
 
-Lambda Functions
-
-registerAppointment.py – Inserts appointment data into RDS.
-
-appointmentList.py – Retrieves appointment data from RDS.
-
-Lambda Function is in lambda_function.py
-
-
-Database – Amazon RDS (PostgreSQL)
-
-The database is hosted on Amazon RDS (PostgreSQL). It securely stores all appointments.
-
-Database Schema
-
+## Database Schema
+```sql
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
     customer_name VARCHAR(255) NOT NULL,
     appointment_date TIMESTAMP NOT NULL,
     technician_assigned VARCHAR(255)
 );
+```
 
- 
-IAM Roles & Policies
-
-Lambda Execution Role – Grants Lambda functions permission to access RDS.
-
-API Gateway Role – Allows API Gateway to invoke Lambda.
-
-S3 Read-Only Role – Ensures frontend access from API Gateway.
-
+# IAM Roles & Policies
+- **Lambda Execution Role** – Grants Lambda functions permission to access RDS.
+- **API Gateway Role** – Allows API Gateway to invoke Lambda.
+- **S3 Read-Only Role** – Ensures frontend access from API Gateway.
