@@ -1,43 +1,52 @@
-# TechFix Management System App
-
-## Overview
-The **TechFix Management System App** is a solution designed to manage service appointments leveraging Amazon Web Services (AWS). This project includes a frontend for user interaction, a backend implemented using AWS Lambda, and a database hosted on Amazon RDS.
-
----
-
-## Project Structure
-
-```
-techfix-management-system-app/
-├── frontend/
+techfix-management-system/
+├── frontend/                # React frontend hosted on Amazon S3
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
 │   │   └── index.js
 │   ├── public/
-│   └── package.json
-├── backend/
+│   ├── package.json
+│   ├── README.md
+│   └── build/ (Generated after running npm build)
+├── backend/                 # Serverless backend using AWS Lambda
 │   ├── lambda/
 │   │   ├── registerAppointment.py
 │   │   ├── appointmentList.py
 │   │   └── config.json
-│   └── requirements.txt
-├── infrastructure/
+│   ├── requirements.txt
+│   ├── API-GatewayConfig.json
+│   ├── RDS-Schema.sql
+│   ├── IAM-Policies.json
+│   └── README.md
+├── infrastructure/           # AWS Infrastructure Configuration
 │   ├── S3Config.json
 │   ├── API-GatewayConfig.json
-│   └── EnvironmentVariables.txt
-└── README.md
-```
+│   ├── Lambda-Roles.json
+│   ├── CloudFormation.yaml
+│   ├── EnvironmentVariables.txt
+│   └── README.md
+└── README.md                 # Project Documentation
 
----
 
-## Configured AWS Services
+Frontend – Hosted on Amazon S3
 
-### 1. **Amazon S3**
-- **Bucket Name:** `tms-frontend-bucket`
-- **Description:** Used to host the frontend for the project, including files like `index.html`, images, and JavaScript required for the user interface.
-- **Bucket Policy:**
-```json
+I built the frontend using React.js and hosted it on Amazon S3 as a static website.
+
+Amazon CloudFront is used for global content delivery.
+
+CORS policies allow the frontend to communicate with API Gateway.
+
+Frontend Deployment Steps
+
+cd frontend
+npm install
+npm run build
+aws s3 sync build/ s3://tms-frontend-bucket --acl public-read
+
+
+S3 Bucket Policy (for public access)
+
+json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -50,9 +59,11 @@ techfix-management-system-app/
         }
     ]
 }
-```
-- **CORS Configuration:**
-```json
+
+
+CORS Configuration
+
+json
 [
     {
         "AllowedHeaders": ["*"],
@@ -62,280 +73,61 @@ techfix-management-system-app/
         "MaxAgeSeconds": 3000
     }
 ]
-```
 
----
 
-### 2. **Amazon API Gateway**
-- **Configured Endpoints: Routes**
-  - **POST** `/registerAppointmentV2`
-  - **GET, POST** `/appointments`
-- **CORS:** Enabled for requests from the S3 bucket.
-- **Route Configuration:**
-  - `/appointments`: Integrated with Lambda functions for appointment data management.
+ 
+ API Gateway – Routing Requests
 
----
+I configured Amazon API Gateway to manage HTTP requests and route them to the appropriate Lambda functions.
 
-### 3. **AWS Lambda**
-- **Lambda Functions:**
-  - **registerAppointmentV2**
-    - **Description:** Inserts appointment data into the database.
-    - **File:** `registerAppointment.py`
-  - **appointmentList**
-    - **Description:** Retrieves and returns all registered appointments.
-    - **File:** `appointmentList.py`
-- **Environment Variables:**
-  - `DB_HOST`: (RDS endpoint)
-  - `DB_NAME`: `tms-database`
-  - `DB_USER`: AWS User
-  - `DB_PASSWORD`: AWS Password
+Configured Endpoints
 
----
+POST /registerAppointment , Saves a new appointment to RDS
 
-# TechFix Management System App
+GET /appointments, Retrieves all scheduled appointments
 
-## Overview
-The **TechFix Management System App** is a solution designed to manage service appointments leveraging Amazon Web Services (AWS). This project includes a frontend for user interaction, a backend implemented using AWS Lambda, and a database hosted on Amazon RDS.
 
----
+Enable CORS in API Gateway
 
-## Project Structure
-
-```
-techfix-management-system-app/
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── index.js
-│   ├── public/
-│   └── package.json
-├── backend/
-│   ├── lambda/
-│   │   ├── registerAppointment.py
-│   │   ├── appointmentList.py
-│   │   └── config.json
-│   └── requirements.txt
-├── infrastructure/
-│   ├── S3Config.json
-│   ├── API-GatewayConfig.json
-│   └── EnvironmentVariables.txt
-└── README.md
-```
-
----
-
-## Configured AWS Services
-
-### 1. **Amazon S3**
-- **Bucket Name:** `tms-frontend-bucket`
-- **Description:** Used to host the frontend for the project, including files like `index.html`, images, and JavaScript required for the user interface.
-- **Bucket Policy:**
-```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::tms-frontend-bucket/*"
-        }
-    ]
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Headers": "*"
 }
-```
-- **CORS Configuration:**
-```json
-[
-    {
-        "AllowedHeaders": ["*"],
-        "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
-        "AllowedOrigins": ["http://tms-frontend-bucket.s3-website-us-east-1.amazonaws.com"],
-        "ExposeHeaders": [],
-        "MaxAgeSeconds": 3000
-    }
-]
-```
 
----
 
-### 2. **Amazon API Gateway**
-- **Configured Endpoints: Routes**
-  - **POST** `/registerAppointmentV2`
-  - **GET, POST** `/appointments`
-- **CORS:** Enabled for requests from the S3 bucket.
-- **Route Configuration:**
-  - `/appointments`: Integrated with Lambda functions for appointment data management.
+Backend – AWS Lambda (Python)
 
----
+The backend is completely serverless, running on AWS Lambda with Python.
 
-### 3. **AWS Lambda**
-- **Lambda Functions:**
-  - **registerAppointmentV2**
-    - **Description:** Inserts appointment data into the database.
-    - **File:** `registerAppointment.py`
-  - **appointmentList**
-    - **Description:** Retrieves and returns all registered appointments.
-    - **File:** `appointmentList.py`
-- **Environment Variables:**
-  - `DB_HOST`: (RDS endpoint)
-  - `DB_NAME`: `tms-database`
-  - `DB_USER`: AWS User
-  - `DB_PASSWORD`: AWS Password
+Lambda Functions
 
----
+registerAppointment.py – Inserts appointment data into RDS.
 
-### 4. **Amazon RDS**
-- **Database Type:** PostgreSQL
-- **Database Schema:**
-```sql
+appointmentList.py – Retrieves appointment data from RDS.
+
+Lambda Function is in lambda_function.py
+
+
+Database – Amazon RDS (PostgreSQL)
+
+The database is hosted on Amazon RDS (PostgreSQL). It securely stores all appointments.
+
+Database Schema
+
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
     customer_name VARCHAR(255) NOT NULL,
     appointment_date TIMESTAMP NOT NULL,
     technician_assigned VARCHAR(255)
 );
-```
-- **Security Configuration:**
-  - **Security Groups:** Configured to allow connections from specific services and authorized IP addresses.
 
----
+ 
+IAM Roles & Policies
 
-### 5. **IAM Roles**
-- **Configured Roles:**
-  - **Lambdas3FullAccess:** Grants Lambda functions access to the S3 bucket.
-  - **RDS-ExecutionRole:** Provides execution and monitoring permissions for RDS.
-  - **registerAppointment-role:** Allows Lambda functions to connect with RDS to insert and retrieve data.
+Lambda Execution Role – Grants Lambda functions permission to access RDS.
 
----
+API Gateway Role – Allows API Gateway to invoke Lambda.
 
-## Local Setup
-
-### 2. Install Dependencies
-- **Backend:**
-```bash
-cd backend/
-pip install -r requirements.txt
-```
-- **Frontend:**
-```bash
-cd frontend/
-npm install
-```
-
-### 3. Run Frontend Locally
-```bash
-npm start
-```
-
----
-
-## Deployment
-
-### Upload Frontend to Amazon S3
-1. Configure the bucket as a static website.
-2. Upload frontend files to the S3 bucket using the AWS console or CLI.
-
-### Integrate API Gateway and Lambda
-1. Configure routes in API Gateway.
-2. Link routes to the corresponding Lambda functions.
-
-### Connect Lambda to RDS
-1. Set up environment variables in Lambda.
-2. Test connectivity and execution of queries from Lambda.
-
----
-
-## Screenshots
-
-1. **S3 Bucket Configuration:**
-   ![S3 Configuration](path/to/screenshot1.png)
-
-2. **API Gateway Routes:**
-   ![API Gateway Routes](path/to/screenshot2.png)
-
-3. **IAM Roles Configuration:**
-   ![IAM Roles](path/to/screenshot3.png)
-
-4. **Environment Variables in Lambda:**
-   ![Lambda Env Variables](path/to/screenshot4.png)
-
----
-
-This README provides a comprehensive overview of the TechFix Management System App, allowing for replication and understanding of its implementation on AWS.
-
-```
-- **Security Configuration:**
-  - **Security Groups:** Configured to allow connections from specific services and authorized IP addresses.
-
----
-
-### 5. **IAM Roles**
-- **Configured Roles:**
-  - **Lambdas3FullAccess:** Grants Lambda functions access to the S3 bucket.
-  - **RDS-ExecutionRole:** Provides execution and monitoring permissions for RDS.
-  - **registerAppointment-role:** Allows Lambda functions to connect with RDS to insert and retrieve data.
-
----
-
-## Local Setup
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/<user>/techfix-management-system-app.git
-```
-
-### 2. Install Dependencies
-- **Backend:**
-```bash
-cd backend/
-pip install -r requirements.txt
-```
-- **Frontend:**
-```bash
-cd frontend/
-npm install
-```
-
-### 3. Run Frontend Locally
-```bash
-npm start
-```
-
----
-
-## Deployment
-
-### Upload Frontend to Amazon S3
-1. Configure the bucket as a static website.
-2. Upload frontend files to the S3 bucket using the AWS console or CLI.
-
-### Integrate API Gateway and Lambda
-1. Configure routes in API Gateway.
-2. Link routes to the corresponding Lambda functions.
-
-### Connect Lambda to RDS
-1. Set up environment variables in Lambda.
-2. Test connectivity and execution of queries from Lambda.
-
----
-
-## Screenshots
-
-1. **S3 Bucket Configuration:**
-   ![S3 Configuration](path/to/screenshot1.png)
-
-2. **API Gateway Routes:**
-   ![API Gateway Routes](path/to/screenshot2.png)
-
-3. **IAM Roles Configuration:**
-   ![IAM Roles](path/to/screenshot3.png)
-
-4. **Environment Variables in Lambda:**
-   ![Lambda Env Variables](path/to/screenshot4.png)
-
----
-
-This README provides a comprehensive overview of the TechFix Management System App, allowing for replication and understanding of its implementation on AWS.
+S3 Read-Only Role – Ensures frontend access from API Gateway.
 
