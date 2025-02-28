@@ -1,7 +1,5 @@
 ## TechFix Management System
 
-A cloud-based appointment management system built on AWS with a React frontend, a serverless backend using AWS Lambda, and an RDS PostgreSQL database.
-
 ### Project Structure
 
 ```
